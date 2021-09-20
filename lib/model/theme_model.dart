@@ -1,21 +1,18 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
-final CupertinoThemeData lightTheme = CupertinoThemeData(
-  textTheme: CupertinoTextThemeData(
-    textStyle:
-        TextStyle(fontFamily: "BalsamiqSans", color: CupertinoColors.black),
+final ThemeData lightTheme = ThemeData(
+  appBarTheme: AppBarTheme(
+    backgroundColor: CupertinoColors.white,
   ),
-  barBackgroundColor: CupertinoColors.white,
   scaffoldBackgroundColor: CupertinoColors.white,
   primaryColor: CupertinoColors.black,
 );
 
-final CupertinoThemeData darkTheme = CupertinoThemeData(
-  textTheme: CupertinoTextThemeData(
-    textStyle:
-        TextStyle(fontFamily: "BalsamiqSans", color: CupertinoColors.white),
+final ThemeData darkTheme = ThemeData(
+  appBarTheme: AppBarTheme(
+    backgroundColor: CupertinoColors.black,
   ),
-  barBackgroundColor: CupertinoColors.black,
   scaffoldBackgroundColor: CupertinoColors.black,
   primaryColor: CupertinoColors.white,
 );

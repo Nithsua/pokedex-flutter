@@ -20,9 +20,10 @@ class SearchBar extends StatelessWidget {
           padding: const EdgeInsets.only(left: 10.0),
           child: Icon(
             prefix,
-            color: CupertinoColors.systemGrey4,
+            color: CupertinoColors.systemGrey3,
           ),
         ),
+        placeholderStyle: TextStyle(color: CupertinoColors.systemGrey3),
         placeholder: 'Search Pokemon here',
         controller: _textEditingController,
       ),

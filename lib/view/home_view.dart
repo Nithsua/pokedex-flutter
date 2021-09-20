@@ -1,75 +1,161 @@
-import 'package:flutter/Cupertino.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:pokedex/view/pokedex_view.dart';
-import 'package:pokedex/widget/search_bar.dart';
+import 'package:flutter/material.dart';
+import 'package:pokedex/model/pokemon_model.dart';
+import 'package:pokedex/service/poke_api.dart';
+import 'package:pokedex/view/pokemon_view.dart';
 
 class HomeView extends StatelessWidget {
+  final String title = "Pokedex";
   const HomeView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        // backgroundColor: CupertinoColors.black,
-        border: Border.all(width: 0.0, style: BorderStyle.none),
-      ),
-      child: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 20.0, left: 30.0, right: 30.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'What Pokemon\nare you lookin\' for?',
-                  style: TextStyle(
-                    fontFamily: "BalsamiqSans",
-                    fontSize: 32,
-                    fontWeight: FontWeight.w700,
-                  ),
+    return Scaffold(
+      body: CustomScrollView(
+        // physics: ClampingScrollPhysics(),
+        slivers: <Widget>[
+          SliverAppBar(
+            expandedHeight: 120,
+            stretch: true,
+            // onStretchTrigger: () {
+            // return pokeApi.getWithLimit();
+            // },
+            flexibleSpace: FlexibleSpaceBar(
+              titlePadding: EdgeInsets.only(left: 20.0),
+              centerTitle: false,
+              // stretchModes: <StretchMode>[StretchMode.fadeTitle],
+              title: Text(
+                'Pokedex',
+                style: TextStyle(
+                  fontFamily: "BalsamiqSans",
+                  fontWeight: FontWeight.w700,
+                  fontSize: 23,
+                  color: Theme.of(context).primaryColor,
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20.0),
-                  child: SearchBar(),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 40.0, bottom: 20.0),
-                  child: CupertinoButton(
-                    padding: const EdgeInsets.all(10.0),
-                    color: CupertinoColors.systemRed,
-                    onPressed: () {
-                      Navigator.push(context,
-                          CupertinoPageRoute(builder: (context) {
-                        return PokedexView();
-                      }));
-                    },
-                    child: SizedBox(
-                      height: 50,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'Pokedex',
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: CupertinoColors.white,
-                              ),
-                            ),
-                          ),
-                          Icon(
-                            CupertinoIcons.arrow_right,
-                            color: CupertinoColors.white,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
+            // title:  Text(
+            //   'Pokedex',
+            //   style: TextStyle(
+            //     fontFamily: "BalsamiqSans",
+            //     fontWeight: FontWeight.w700,
+            //     color: Theme.of(context).primaryColor,
+            //   ),
+            // ),
           ),
-        ),
+          SliverList(
+            delegate: SliverChildListDelegate([
+              SingleChildScrollView(
+                physics: NeverScrollableScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 20.0, right: 20.0),
+                  child: FutureBuilder(
+                      future: pokeApi.getWithLimit(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          return GridView.builder(
+                              physics: NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: poke.length,
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                      childAspectRatio: 1.5,
+                                      crossAxisCount:
+                                          (MediaQuery.of(context).orientation ==
+                                                  Orientation.portrait)
+                                              ? 2
+                                              : 3),
+                              itemBuilder: (context, count) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => PokemonView(
+                                                  title: poke[count].name,
+                                                  previousTitle: title,
+                                                  pokemonIndex: count,
+                                                )));
+                                  },
+                                  child: Card(
+                                    elevation: 0.0,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(20.0)),
+                                    color: pokemonTypeColors[poke[count].type],
+                                    child: Stack(children: [
+                                      Positioned(
+                                        right: 0,
+                                        bottom: 0,
+                                        child: Image.network(
+                                          poke[count].image,
+                                          height: 80,
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            top: 10.0,
+                                            bottom: 10.0,
+                                            left: 20.0,
+                                            right: 1.0),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 20.0),
+                                              child: Text(
+                                                poke[count].name,
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.w700,
+                                                    color: Colors.white),
+                                              ),
+                                            ),
+                                            Card(
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          20.0)),
+                                              color:
+                                                  Colors.grey.withOpacity(0.4),
+                                              elevation: 0.0,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 5.0,
+                                                        horizontal: 8.0),
+                                                child: Text(
+                                                  poke[count].type.displayTitle,
+                                                  style: TextStyle(
+                                                      fontSize: 10,
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ]),
+                                  ),
+                                );
+                              });
+                        } else {
+                          return Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Center(
+                                child: CircularProgressIndicator(
+                              strokeWidth: 2.0,
+                              color: Colors.black,
+                            )),
+                          );
+                        }
+                      }),
+                ),
+              ),
+            ]),
+          ),
+        ],
       ),
     );
   }
